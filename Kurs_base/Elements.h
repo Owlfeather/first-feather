@@ -1,4 +1,4 @@
-#pragma once
+п»ї#pragma once
 #include <locale.h>
 #include <stdio.h>
 #include <conio.h>
@@ -9,7 +9,7 @@
 
 using namespace std;
 
-//----------------------------Классы-------------------------------
+//----------------------------РљР»Р°СЃСЃС‹-------------------------------
 
 class ItemSymb {
 
@@ -18,7 +18,7 @@ class ItemSymb {
 
 public:
 
-	ItemSymb() : term(true), content("") {}		// по умолчанию создаётся терминал (символы)
+	ItemSymb() : term(true), content("") {}		// РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ СЃРѕР·РґР°С‘С‚СЃСЏ С‚РµСЂРјРёРЅР°Р» (СЃРёРјРІРѕР»С‹)
 	ItemSymb(string inp_cont, bool inp_term = true) : content(inp_cont), term(inp_term) {}
 
 	void SetSymb(string inp_cont, bool inp_term = true) {
@@ -42,14 +42,14 @@ public:
 	ItemString() {}
 	ItemString(vector<ItemSymb> inp_str) : cur_string(inp_str) {}
 
-	void SetOutputString(string & orig_str) {			// первоначальная установка строки
+	void SetOutputString(string & orig_str) {			// РїРµСЂРІРѕРЅР°С‡Р°Р»СЊРЅР°СЏ СѓСЃС‚Р°РЅРѕРІРєР° СЃС‚СЂРѕРєРё
 
 		ItemSymb buffer;
 		for (unsigned i = 0; i < orig_str.length(); i++) {
 			buffer.SetSymb(string(&orig_str[i]));
 			cur_string.push_back(buffer);
 
-			cout << "Добавлено в вектор: " << orig_str[i] << endl;
+			cout << "Р”РѕР±Р°РІР»РµРЅРѕ РІ РІРµРєС‚РѕСЂ: " << orig_str[i] << endl;
 		}
 	}
 
@@ -101,7 +101,7 @@ protected:
 	vector<ItemRule> rules;
 	ItemString parsing_str;
 
-	//TODO: создание и синхронизация с логом разбора
+	//TODO: СЃРѕР·РґР°РЅРёРµ Рё СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ СЃ Р»РѕРіРѕРј СЂР°Р·Р±РѕСЂР°
 
 public:
 
@@ -116,49 +116,49 @@ class LtoR_MethodAlg : public ParseAlgorithm {
 public:
 	void SetRulesOfAlg() override {
 
-		//___________________________________Создание нетерминалов
+		//___________________________________РЎРѕР·РґР°РЅРёРµ РЅРµС‚РµСЂРјРёРЅР°Р»РѕРІ
 
-		ItemSymb c_integer("<Целое>", false);
-		ItemSymb c_unsigned_int("<ЦБЗ>", false);
-		ItemSymb c_number("<Цифра>", false);
-		ItemSymb c_sign("<Знак>", false);
+		ItemSymb c_integer("<Р¦РµР»РѕРµ>", false);
+		ItemSymb c_unsigned_int("<Р¦Р‘Р—>", false);
+		ItemSymb c_number("<Р¦РёС„СЂР°>", false);
+		ItemSymb c_sign("<Р—РЅР°Рє>", false);
 
 		vector<ItemSymb> buf_symb;
 		vector<ItemString> buf_str;
 		ItemString one_str;
 
 		/*
-		buf_symb.push_back(c_sign);				// <знак><цбз>
+		buf_symb.push_back(c_sign);				// <Р·РЅР°Рє><С†Р±Р·>
 		buf_symb.push_back(c_unsigned_int);
 		*/
 		buf_symb = { c_sign, c_unsigned_int };
 		
 		one_str.SetString(buf_symb);
-		buf_str.push_back(one_str);				// записали вар1
+		buf_str.push_back(one_str);				// Р·Р°РїРёСЃР°Р»Рё РІР°СЂ1
 		buf_symb.clear();
 
-		buf_symb.push_back(c_unsigned_int);		// <цбз>
+		buf_symb.push_back(c_unsigned_int);		// <С†Р±Р·>
 		one_str.SetString(buf_symb);
-		buf_str.push_back(one_str);				// записали вар2
+		buf_str.push_back(one_str);				// Р·Р°РїРёСЃР°Р»Рё РІР°СЂ2
 
-		ItemRule rule(c_integer, buf_str);		// ПРАВИЛО
-		buf_str.clear();						// чистка вариантов
-		rules.push_back(rule);					// запушили
+		ItemRule rule(c_integer, buf_str);		// РџР РђР’РР›Рћ
+		buf_str.clear();						// С‡РёСЃС‚РєР° РІР°СЂРёР°РЅС‚РѕРІ
+		rules.push_back(rule);					// Р·Р°РїСѓС€РёР»Рё
 		//----------------------------------------------------
 
-		buf_symb.push_back(c_number);			// <цбз><цифра>
+		buf_symb.push_back(c_number);			// <С†Р±Р·><С†РёС„СЂР°>
 		one_str.SetString(buf_symb); 
-		buf_str.push_back(one_str);				// вар1
+		buf_str.push_back(one_str);				// РІР°СЂ1
 		buf_symb.clear();
 
-		buf_symb.push_back(c_number);			// <цифра>
+		buf_symb.push_back(c_number);			// <С†РёС„СЂР°>
 		one_str.SetString(buf_symb);
-		buf_str.push_back(one_str);				// вар2
+		buf_str.push_back(one_str);				// РІР°СЂ2
 		buf_symb.clear();
 
-		rule.SetRule(c_unsigned_int, buf_str);	// ПРАВИЛО
-		buf_str.clear();						// чистка вариантов
-		rules.push_back(rule);					// запушили
+		rule.SetRule(c_unsigned_int, buf_str);	// РџР РђР’РР›Рћ
+		buf_str.clear();						// С‡РёСЃС‚РєР° РІР°СЂРёР°РЅС‚РѕРІ
+		rules.push_back(rule);					// Р·Р°РїСѓС€РёР»Рё
 		//----------------------------------------------------
 
 		ItemSymb symb;
@@ -166,13 +166,13 @@ public:
 			symb.SetSymb(to_string(i));
 			buf_symb.push_back(symb);
 			one_str.SetString(buf_symb);
-			buf_str.push_back(one_str);			// новый вариант
+			buf_str.push_back(one_str);			// РЅРѕРІС‹Р№ РІР°СЂРёР°РЅС‚
 			buf_symb.clear();
 		}
 
-		rule.SetRule(c_number, buf_str);		// ПРАВИЛО
-		buf_str.clear();						// чистка вариантов
-		rules.push_back(rule);					// запушили
+		rule.SetRule(c_number, buf_str);		// РџР РђР’РР›Рћ
+		buf_str.clear();						// С‡РёСЃС‚РєР° РІР°СЂРёР°РЅС‚РѕРІ
+		rules.push_back(rule);					// Р·Р°РїСѓС€РёР»Рё
 		//----------------------------------------------------
 
 		symb.SetSymb("+");
@@ -187,12 +187,12 @@ public:
 		buf_str.push_back(one_str);				// -
 		buf_symb.clear();
 
-		rule.SetRule(c_sign, buf_str);			// ПРАВИЛО
-		buf_str.clear();						// чистка вариантов
-		rules.push_back(rule);					// запушили
+		rule.SetRule(c_sign, buf_str);			// РџР РђР’РР›Рћ
+		buf_str.clear();						// С‡РёСЃС‚РєР° РІР°СЂРёР°РЅС‚РѕРІ
+		rules.push_back(rule);					// Р·Р°РїСѓС€РёР»Рё
 		//----------------------------------------------------
 
-		cout << endl << "Правила для разбора слева направо сформированы:" << endl << endl;
+		cout << endl << "РџСЂР°РІРёР»Р° РґР»СЏ СЂР°Р·Р±РѕСЂР° СЃР»РµРІР° РЅР°РїСЂР°РІРѕ СЃС„РѕСЂРјРёСЂРѕРІР°РЅС‹:" << endl << endl;
 		for (unsigned i = 0; i < rules.size(); i++) {
 			rules[i].PrintRule();
 			cout << endl;
