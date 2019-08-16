@@ -116,80 +116,57 @@ class LtoR_MethodAlg : public ParseAlgorithm {
 public:
 	void SetRulesOfAlg() override {
 
-		//___________________________________Создание нетерминалов
+		//__________________________________________Создание нетерминалов
 
 		ItemSymb c_integer("<Целое>", false);
 		ItemSymb c_unsigned_int("<ЦБЗ>", false);
 		ItemSymb c_number("<Цифра>", false);
 		ItemSymb c_sign("<Знак>", false);
 
-		vector<ItemSymb> buf_symb;
-		vector<ItemString> buf_str;
-		ItemString one_str;
-
-		/*
-		buf_symb.push_back(c_sign);				// <знак><цбз>
-		buf_symb.push_back(c_unsigned_int);
-		*/
-		buf_symb = { c_sign, c_unsigned_int };
+		vector<ItemSymb> buf_symb;					// переменная-шаблон для варианта раскрытия правила
+		vector<ItemString> buf_str;					// переменная-шаблон для хранения всех вариантов раскрытия правила (правая часть правила)
 		
-		one_str.SetString(buf_symb);
-		buf_str.push_back(one_str);				// записали вар1
-		buf_symb.clear();
+		buf_symb = { c_sign, c_unsigned_int };		// <знак><цбз>
+		buf_str.push_back(ItemString(buf_symb));	// записали вариант 1
 
-		buf_symb.push_back(c_unsigned_int);		// <цбз>
-		one_str.SetString(buf_symb);
-		buf_str.push_back(one_str);				// записали вар2
+		buf_symb = { c_unsigned_int };				// <цбз>
+		buf_str.push_back(ItemString(buf_symb));	// записали вариант 2
 
-		ItemRule rule(c_integer, buf_str);		// ПРАВИЛО
-		buf_str.clear();						// чистка вариантов
-		rules.push_back(rule);					// запушили
+		ItemRule rule(c_integer, buf_str);			// ПРАВИЛО
+		buf_str.clear();							// чистка вариантов
+		rules.push_back(rule);						// добавление нового правила
 		//----------------------------------------------------
 
-		buf_symb.push_back(c_number);			// <цбз><цифра>
-		one_str.SetString(buf_symb); 
-		buf_str.push_back(one_str);				// вар1
-		buf_symb.clear();
+		buf_symb.push_back(c_number);				// <цбз><цифра>
+		buf_str.push_back(ItemString(buf_symb));	// записали вариант 1
 
-		buf_symb.push_back(c_number);			// <цифра>
-		one_str.SetString(buf_symb);
-		buf_str.push_back(one_str);				// вар2
-		buf_symb.clear();
+		buf_symb = { c_number };					// <цифра>
+		buf_str.push_back(ItemString(buf_symb));	// записали вариант 2
 
-		rule.SetRule(c_unsigned_int, buf_str);	// ПРАВИЛО
-		buf_str.clear();						// чистка вариантов
-		rules.push_back(rule);					// запушили
-		//----------------------------------------------------
+		rule.SetRule(c_unsigned_int, buf_str);		// ПРАВИЛО
+		buf_str.clear();							// чистка вариантов
+		rules.push_back(rule);						// добавление нового правила
 
-		ItemSymb symb;
+		//__________________________________________Создание терминалов
+
 		for (int i = 0; i < 10; i++) {
-			symb.SetSymb(to_string(i));
-			buf_symb.push_back(symb);
-			one_str.SetString(buf_symb);
-			buf_str.push_back(one_str);			// новый вариант
-			buf_symb.clear();
+			buf_symb = { ItemSymb(to_string(i)) };
+			buf_str.push_back(ItemString(buf_symb));   // новый вариант
 		}
 
-		rule.SetRule(c_number, buf_str);		// ПРАВИЛО
-		buf_str.clear();						// чистка вариантов
-		rules.push_back(rule);					// запушили
+		rule.SetRule(c_number, buf_str);			// ПРАВИЛО
+		buf_str.clear();							// чистка вариантов
+		rules.push_back(rule);						// добавление нового правила
 		//----------------------------------------------------
 
-		symb.SetSymb("+");
-		buf_symb.push_back(symb);
-		one_str.SetString(buf_symb);
-		buf_str.push_back(one_str);				// +
-		buf_symb.clear();
+		buf_symb = { ItemSymb("+") };
+		buf_str.push_back(ItemString(buf_symb));	// +
 
-		symb.SetSymb("-");
-		buf_symb.push_back(symb);
-		one_str.SetString(buf_symb);
-		buf_str.push_back(one_str);				// -
-		buf_symb.clear();
+		buf_symb = { ItemSymb("-") };
+		buf_str.push_back(ItemString(buf_symb));	// -
 
-		rule.SetRule(c_sign, buf_str);			// ПРАВИЛО
-		buf_str.clear();						// чистка вариантов
-		rules.push_back(rule);					// запушили
+		rule.SetRule(c_sign, buf_str);				// ПРАВИЛО
+		rules.push_back(rule);						// добавление нового правила
 		//----------------------------------------------------
 
 		cout << endl << "Правила для разбора слева направо сформированы:" << endl << endl;
