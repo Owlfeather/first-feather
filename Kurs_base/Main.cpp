@@ -8,11 +8,13 @@ int main() {
 
 	string input_str = "-45";
 	
-	ItemString ParsingString;
-	ParsingString.SetOutputString(input_str);
+	//ItemString ParsingString;
+	//ParsingString.SetOutputString(input_str);
 
 	LtoR_MethodAlg alg;
 	alg.SetRulesOfAlg();
+	alg.SetParsingStr(input_str);
+	alg.DoParse();
 
 
 	system("pause");
