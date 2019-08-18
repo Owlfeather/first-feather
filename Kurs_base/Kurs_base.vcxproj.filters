@@ -20,7 +20,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Elements.h">
+    <ClInclude Include="Algorithm_LtoR.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Basic_Elements.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Alg_Elements.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

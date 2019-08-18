@@ -1,4 +1,6 @@
-﻿#include "Elements.h"
+﻿#include "Basic_Elements.h"
+#include "Algorithm_LtoR.h"
+#include "Alg_Elements.h"
 
 //************************Программа************************
 
