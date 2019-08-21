@@ -1,4 +1,4 @@
-#pragma once
+п»ї#pragma once
 #include <locale.h>
 #include <stdio.h>
 #include <conio.h>
@@ -6,54 +6,56 @@
 #include <stdlib.h>
 #include <iostream>
 #include <vector>
+#include <tuple>
 #include "Alg_Elements.h"
 
 
 class LtoR_MethodAlg : public ParseAlgorithm {
+	ItemString parsed_item;
 public:
 	void SetRulesOfAlg() override {
 
-		//__________________________________________Создание нетерминалов
+		//__________________________________________РЎРѕР·РґР°РЅРёРµ РЅРµС‚РµСЂРјРёРЅР°Р»РѕРІ
 
-		ItemSymb c_integer("<Целое>", false);
-		ItemSymb c_unsigned_int("<ЦБЗ>", false);
-		ItemSymb c_number("<Цифра>", false);
-		ItemSymb c_sign("<Знак>", false);
+		ItemSymb c_integer("<Р¦РµР»РѕРµ>", false);
+		ItemSymb c_unsigned_int("<Р¦Р‘Р—>", false);
+		ItemSymb c_number("<Р¦РёС„СЂР°>", false);
+		ItemSymb c_sign("<Р—РЅР°Рє>", false);
 
-		vector<ItemSymb> buf_symb;					// переменная-шаблон для варианта раскрытия правила
-		vector<ItemString> buf_str;					// переменная-шаблон для хранения всех вариантов раскрытия правила (правая часть правила)
+		vector<ItemSymb> buf_symb;					// РїРµСЂРµРјРµРЅРЅР°СЏ-С€Р°Р±Р»РѕРЅ РґР»СЏ РІР°СЂРёР°РЅС‚Р° СЂР°СЃРєСЂС‹С‚РёСЏ РїСЂР°РІРёР»Р°
+		vector<ItemString> buf_str;					// РїРµСЂРµРјРµРЅРЅР°СЏ-С€Р°Р±Р»РѕРЅ РґР»СЏ С…СЂР°РЅРµРЅРёСЏ РІСЃРµС… РІР°СЂРёР°РЅС‚РѕРІ СЂР°СЃРєСЂС‹С‚РёСЏ РїСЂР°РІРёР»Р° (РїСЂР°РІР°СЏ С‡Р°СЃС‚СЊ РїСЂР°РІРёР»Р°)
 
-		buf_symb = { c_sign, c_unsigned_int };		// <знак><цбз>
-		buf_str.push_back(ItemString(buf_symb));	// записали вариант 1
+		buf_symb = { c_sign, c_unsigned_int };		// <Р·РЅР°Рє><С†Р±Р·>
+		buf_str.push_back(ItemString(buf_symb));	// Р·Р°РїРёСЃР°Р»Рё РІР°СЂРёР°РЅС‚ 1
 
-		buf_symb = { c_unsigned_int };				// <цбз>
-		buf_str.push_back(ItemString(buf_symb));	// записали вариант 2
+		buf_symb = { c_unsigned_int };				// <С†Р±Р·>
+		buf_str.push_back(ItemString(buf_symb));	// Р·Р°РїРёСЃР°Р»Рё РІР°СЂРёР°РЅС‚ 2
 
-		ItemRule rule(c_integer, buf_str);			// ПРАВИЛО
-		buf_str.clear();							// чистка вариантов
-		rules.push_back(rule);						// добавление нового правила
+		ItemRule rule(c_integer, buf_str);			// РџР РђР’РР›Рћ
+		buf_str.clear();							// С‡РёСЃС‚РєР° РІР°СЂРёР°РЅС‚РѕРІ
+		rules.push_back(rule);						// РґРѕР±Р°РІР»РµРЅРёРµ РЅРѕРІРѕРіРѕ РїСЂР°РІРёР»Р°
 		//----------------------------------------------------
 
-		buf_symb.push_back(c_number);				// <цбз><цифра>
-		buf_str.push_back(ItemString(buf_symb));	// записали вариант 1
+		buf_symb.push_back(c_number);				// <С†Р±Р·><С†РёС„СЂР°>
+		buf_str.push_back(ItemString(buf_symb));	// Р·Р°РїРёСЃР°Р»Рё РІР°СЂРёР°РЅС‚ 1
 
-		buf_symb = { c_number };					// <цифра>
-		buf_str.push_back(ItemString(buf_symb));	// записали вариант 2
+		buf_symb = { c_number };					// <С†РёС„СЂР°>
+		buf_str.push_back(ItemString(buf_symb));	// Р·Р°РїРёСЃР°Р»Рё РІР°СЂРёР°РЅС‚ 2
 
-		rule.SetRule(c_unsigned_int, buf_str);		// ПРАВИЛО
-		buf_str.clear();							// чистка вариантов
-		rules.push_back(rule);						// добавление нового правила
+		rule.SetRule(c_unsigned_int, buf_str);		// РџР РђР’РР›Рћ
+		buf_str.clear();							// С‡РёСЃС‚РєР° РІР°СЂРёР°РЅС‚РѕРІ
+		rules.push_back(rule);						// РґРѕР±Р°РІР»РµРЅРёРµ РЅРѕРІРѕРіРѕ РїСЂР°РІРёР»Р°
 
-		//__________________________________________Создание терминалов
+		//__________________________________________РЎРѕР·РґР°РЅРёРµ С‚РµСЂРјРёРЅР°Р»РѕРІ
 
 		for (int i = 0; i < 10; i++) {
 			buf_symb = { ItemSymb(to_string(i)) };
-			buf_str.push_back(ItemString(buf_symb));   // новый вариант
+			buf_str.push_back(ItemString(buf_symb));   // РЅРѕРІС‹Р№ РІР°СЂРёР°РЅС‚
 		}
 
-		rule.SetRule(c_number, buf_str);			// ПРАВИЛО
-		buf_str.clear();							// чистка вариантов
-		rules.push_back(rule);						// добавление нового правила
+		rule.SetRule(c_number, buf_str);			// РџР РђР’РР›Рћ
+		buf_str.clear();							// С‡РёСЃС‚РєР° РІР°СЂРёР°РЅС‚РѕРІ
+		rules.push_back(rule);						// РґРѕР±Р°РІР»РµРЅРёРµ РЅРѕРІРѕРіРѕ РїСЂР°РІРёР»Р°
 		//----------------------------------------------------
 
 		buf_symb = { ItemSymb("+") };
@@ -62,49 +64,199 @@ public:
 		buf_symb = { ItemSymb("-") };
 		buf_str.push_back(ItemString(buf_symb));	// -
 
-		rule.SetRule(c_sign, buf_str);				// ПРАВИЛО
-		rules.push_back(rule);						// добавление нового правила
+		rule.SetRule(c_sign, buf_str);				// РџР РђР’РР›Рћ
+		rules.push_back(rule);						// РґРѕР±Р°РІР»РµРЅРёРµ РЅРѕРІРѕРіРѕ РїСЂР°РІРёР»Р°
 		//----------------------------------------------------
 
-		cout << endl << "Правила для разбора слева направо сформированы:" << endl << endl;
+		cout << endl << "РџСЂР°РІРёР»Р° РґР»СЏ СЂР°Р·Р±РѕСЂР° СЃР»РµРІР° РЅР°РїСЂР°РІРѕ СЃС„РѕСЂРјРёСЂРѕРІР°РЅС‹:" << endl << endl;
 		for (unsigned i = 0; i < rules.size(); i++) {
 			rules[i].PrintRule();
 			cout << endl;
 		}
 	}
 
+	unsigned FindMaxQuantity() {
+		unsigned max_quantity = 0;
+		unsigned cur_length = 0;
+		for (int i = 0; i < rules.size(); i++) {
+			for (int j = 0; j < rules[i].RightSize(); j++) {
+				cur_length = rules[i][j].Length();
+				if (cur_length > max_quantity) {
+					max_quantity = cur_length;
+				}
+			}
+		}
+		return max_quantity;
+	}
+
+	RuleNum FindRuleNum(RuleNum rulenum = {0, 0}) {
+
+		int rules_number = rules.size();		// СЃСѓРјРјР°СЂРЅРѕРµ С‡РёСЃР»Рѕ РїСЂР°РІРёР»
+		int subrules_number;					// С‡РёСЃР»Рѕ РїРѕРґРїСѓРЅРєС‚РѕРІ (РІР°СЂРёР°РЅС‚РѕРІ СЂР°СЃС€РёС„СЂРѕРІРєРё) РѕРґРЅРѕРіРѕ РїСЂР°РІРёР»Р°
+
+		for (int i = rulenum.fir_num; i < rules_number; i++) {
+			subrules_number = rules[i].RightSize();
+			for (int j = rulenum.sec_num; j < subrules_number; j++) {
+				if (parsed_item == rules[i][j]) {
+
+					cout << endl << endl << "РЎРћР’РџРђР”Р•РќРР•";
+					cout << endl << "Р Р°СЃСЃРјР°С‚СЂРёРІР°РµРјР°СЏ РєРѕРЅСЃС‚СЂСѓРєС†РёСЏ: ";
+					parsed_item.PrintString();
+					cout << endl;
+					cout << "РЎРѕРІРїР°РґРµРЅРёРµ: РїСЂР°РІРёР»Рѕ в„–" << i << ", РїСѓРЅРєС‚ в„–" << j <<" : ";
+					rules[i][j].PrintString();
+					cout << endl;
+					return RuleNum{ i, j };
+				}
+			}
+		}
+		return RuleNum{ -1, -1 };
+	};
+
+	void WriteToLog(RuleNum cur_rule_num) {
+		LtoR_Line * buf_line;
+		cout << endl << "РћСЃСѓС‰РµСЃС‚РІР»СЏРµС‚СЃСЏ Р·Р°РїРёСЃСЊ РІ Р»РѕРі" << endl;
+		buf_line = new LtoR_Line();
+		buf_line->SetLine(string(parsing_str), cur_rule_num);
+		parsing_log.AddRecordLine(buf_line);
+	}
+
+	void Rollback() {
+
+		cout << endl << "Р’С‹РїРѕР»РЅСЏРµС‚СЃСЏ РѕС‚РєР°С‚ РЅР°Р·Р°Рґ" << endl;
+		parsing_str.SetStringFromLog((*(parsing_log[parsing_log.Size() - 2])).GetCurString());
+		RuleNum prev_rule = (*(parsing_log[parsing_log.Size() - 2])).GetRuleNum();
+
+		//if (prev_rule.sec_num == rules[prev_rule.fir_num].RightSize() - 1) prev_rule.fir_num++;
+		//else prev_rule.sec_num++;
+
+		parsed_item = rules[prev_rule.fir_num][prev_rule.sec_num];
+
+		cout << endl << "Р Р°Р·Р±РёСЂР°РµРјР°СЏ СЃС‚СЂРѕРєР°: ";
+		parsing_str.PrintString();
+			//cout << endl;
+			//cout << endl << "РќР°С‡РЅС‘Рј РїРѕРёСЃРє СЃ РїСЂР°РІРёР»Р°: " << prev_rule.fir_num << ", " << prev_rule.sec_num << endl;
+		cout << endl << "Р‘СѓРґРµС‚ РІС‹РїРѕР»РЅСЏС‚СЊСЃСЏ РїРѕРёСЃРє РєРѕРЅСЃС‚СЂСѓРєС†РёРё: ";
+		parsed_item.PrintString();
+		cout << endl;
+		
+	}
+
+	RuleNum GetNextRule() {
+		RuleNum prev_rule = (*(parsing_log[parsing_log.Size() - 2])).GetRuleNum();
+		if (prev_rule.sec_num == rules[prev_rule.fir_num].RightSize() - 1) prev_rule.fir_num++;
+		else prev_rule.sec_num++;
+		cout << endl << "РќР°С‡РЅС‘Рј РїРѕРёСЃРє СЃ РїСЂР°РІРёР»Р°: " << prev_rule.fir_num << ", " << prev_rule.sec_num << endl;
+		return prev_rule;
+	}
+
 	bool DoParse() override {
 
-		int str_position = 0;										// разбор осуществляется с начала строки
-		int quantity = 1;											// количество рассматриваемых символов (пока 1)
+		int okey = 0;
+		unsigned entry_point = 0;		// СѓРєР°Р·С‹РІР°РµС‚ РЅР° СЃР»РµРґСѓСЋС‰РёР№ РґР»СЏ РґРѕР±Р°РІР»РµРЅРёСЏ РІ parsing_item СЃРёРјРІРѕР»
+		//ItemString parsed_item({ parsing_str[entry_point] });		// СЂР°Р·Р±РёСЂР°РµРјС‹Р№ СѓС‡Р°СЃС‚РѕРє СЃС‚СЂРѕРєРё
+		parsed_item.SetString({ parsing_str[entry_point] });	// СЂР°Р·Р±РёСЂР°РµРјС‹Р№ СѓС‡Р°СЃС‚РѕРє СЃС‚СЂРѕРєРё
+		LtoR_Line * buf_line;									// Р±СѓС„РµСЂ РґР»СЏ Р·Р°РїРёСЃРё РІ Р»РѕРі СЂР°Р·Р±РѕСЂР°
+		RuleNum next_rule = { 0, 0 };
+
+		unsigned quantity = FindMaxQuantity();
+
+		while (okey == 0) {
+		RuleNum rule_num = FindRuleNum(next_rule);
+
+		if (rule_num.fir_num != -1) {		// Р•СЃР»Рё РїСЂР°РІРёР»Рѕ РЅР°С€Р»РѕСЃСЊ
+
+			cout <<endl << "Р—Р°РјРµРЅР°: ";
+			parsed_item.PrintString();
+			cout << " РЅР° ";
+			cout << string(rules[rule_num.fir_num].GetLeft());
+
+			// Р·Р°РїРёСЃСЊ РІ Р»РѕРі
+			WriteToLog(rule_num);
+			//
+
+			// Р·Р°РјРµРЅР° СЃС‚СЂРѕРє
+			parsing_str.TransformAccordingRule(rules[rule_num.fir_num].GetLeft(), entry_point, parsed_item.Length());
+			parsed_item.SetString({ parsing_str[0] });
+			//
+
+			if (rule_num.fir_num == 0) {
+				// РїРѕРјРµРЅСЏР»Рё РЅР° Р°РєСЃРёРѕРјСѓ
+				if (parsing_str.Length() == 1) {
+					// РІС‹СЏРІР»РµРЅРѕ С†РµР»РѕРµ, РєРѕРЅРµС† СЂР°Р·Р±РѕСЂР°
+
+					WriteToLog({-3, -3}); // РљРћР” -3 - РєРѕРЅРµС† СЂР°Р·Р±РѕСЂР°
+					okey = 1;
+					//return true;
+				}
+				else {
+					// РѕС‚РєР°С‚ РЅР°Р·Р°Рґ
+					WriteToLog({ -2, -2 }); // РљРћР” -2 - С‚СѓРїРёРє, РѕС‚РєР°С‚ РЅР°Р·Р°Рґ
+					Rollback();
+					next_rule = GetNextRule();
+				}
+			}
+			else {
+				entry_point = 0;
+				// РІ РЅР°С‡Р°Р»Рѕ
+			}
+		}
+		else { // РµСЃР»Рё РїСЂР°РІРёР»Рѕ РЅРµ РЅР°С€Р»РѕСЃСЊ
+			if ((parsed_item.Length() == 1) && (parsed_item[0].IsTerm())) {
+
+				//Р·Р°РїРёСЃСЊ РІ Р»РѕРі
+				WriteToLog({ -4, -4 });
+
+				cout << endl << "РћС€РёР±РєР°, РЅРµРѕРїРѕР·РЅР°РЅРЅС‹Р№ СЃРёРјРІРѕР» : ";
+				parsed_item.PrintString();
+				cout << endl;
+				okey = -1;
+				//return false;
+			}
+			if ((parsed_item.Length() < quantity) && (entry_point != parsing_str.Length() - 1)) {
+				parsed_item.AddSymb(parsing_str[entry_point + parsed_item.Length()]);
+			}
+			else {
+				parsed_item.DeleteSymb(0, 1);
+				entry_point++;
+			}
+			next_rule = { 0, 0 };
+			// РІ РЅР°С‡Р°Р»Рѕ
+		}
+		}
+		parsing_log.PrintLogltoR();
+		return true;
+
+		//cout << "Р—Р°РјРµРЅР°: " << string(parsing_str[str_position]) << " РЅР° " << string(rules[rule_num].GetLeft());
+	}
+
+	/*
+	bool DoParse() override {
+
+		int str_position = 0;										// СЂР°Р·Р±РѕСЂ РѕСЃСѓС‰РµСЃС‚РІР»СЏРµС‚СЃСЏ СЃ РЅР°С‡Р°Р»Р° СЃС‚СЂРѕРєРё
+		int quantity = 1;											// РєРѕР»РёС‡РµСЃС‚РІРѕ СЂР°СЃСЃРјР°С‚СЂРёРІР°РµРјС‹С… СЃРёРјРІРѕР»РѕРІ (РїРѕРєР° 1)
 		ItemString parsed_item({ parsing_str[str_position] });
 
-		//parsed_item.AddSymb(parsing_str[1]);
-		//cout << endl << "Рассматриваемая конструкция: ";
-		//parsed_item.PrintString();
-		//cout << endl;
-		//cout << endl;
-		//rules[3][1].PrintString();
-
 		int i = 0, j = 0;
-		bool found = false;			// найден ли элемент
-		int rule_num, rule_letter;				// номер раскрываемого правила
+		bool found = false;			// РЅР°Р№РґРµРЅ Р»Рё СЌР»РµРјРµРЅС‚
+		int rule_num, rule_letter;	// РЅРѕРјРµСЂ СЂР°СЃРєСЂС‹РІР°РµРјРѕРіРѕ РїСЂР°РІРёР»Р°
 		LtoR_Line * buf_line;
-
-	//	buf_line = new LtoR_Line();
-	//	buf_line->SetLine(string(parsing_str), "начало");
-	//	parsing_log.AddRecordLine(buf_line);
+		int prev_position;
+		int prev_quantity;
 
 
 		while (str_position != parsing_str.Length()) {
+			cout << "РёС‰РµРј: ";
+			parsed_item.PrintString();
+			cout <<endl << "РЅР°С‡РёРЅР°РµРј РїРѕРёСЃРє: РїСЂР°РІРёР»Рѕ в„–" << i << ", РїСѓРЅРєС‚ в„–" << j << endl;
 
 			while ((i != rules.size()) && (found == false)) {
 				while ((j != rules[i].RightSize()) && (found == false)) {
 					if (parsed_item == rules[i][j]) {
-						cout << endl << "Рассматриваемая конструкция: ";
+						cout << endl << "Р Р°СЃСЃРјР°С‚СЂРёРІР°РµРјР°СЏ РєРѕРЅСЃС‚СЂСѓРєС†РёСЏ: ";
 						parsed_item.PrintString();
 						cout << endl;
-						cout << "Совпадение: правило №" << i << ", пункт №" << j << endl;
+						cout << "РЎРѕРІРїР°РґРµРЅРёРµ: РїСЂР°РІРёР»Рѕ в„–" << i << ", РїСѓРЅРєС‚ в„–" << j << endl;
 						rules[i][j].PrintString();
 						cout << endl;
 
@@ -119,50 +271,92 @@ public:
 				j = 0;
 			}
 			if (found) {
-				cout << "Замена: " << string(parsing_str[str_position]) << " на " << string(rules[rule_num].GetLeft());
-				//
+				prev_position = str_position;
+				prev_quantity = quantity;
+				cout << "Р—Р°РјРµРЅР°: " << string(parsing_str[str_position]) << " РЅР° " << string(rules[rule_num].GetLeft());
 
+				//Р·Р°РїРёСЃСЊ РІ Р»РѕРі
+				cout << endl << "Р·Р°РїРёСЃСЊ РІ Р»РѕРі" << endl;
 				buf_line = new LtoR_Line();
-				buf_line->SetLine(string(parsing_str), to_string(rule_num + 1) + rules[rule_num].GetLetterOfRule(rule_letter));
+				buf_line->SetLine(string(parsing_str), rule_num, rule_letter);
 				parsing_log.AddRecordLine(buf_line);
 
 				//
-				if (quantity == 1) {
-					parsing_str[str_position] = rules[rule_num].GetLeft();
-					str_position = 0;
-				}
-				else {
-					parsing_str[str_position] = rules[rule_num].GetLeft();
+
+				parsing_str[str_position] = rules[rule_num].GetLeft();
+
+				if (quantity != 1) {
 					parsing_str.DeleteSymb(str_position + 1, quantity - 1);
-					str_position = 0;
 					quantity = 1;
+					prev_quantity = 2;
 
 				}
+				else
+					prev_quantity = 1;
+				str_position = 0;
 
 				parsed_item[0] = parsing_str[str_position];
-				cout << endl << "Получено: ";
+				cout << endl << "РџРѕР»СѓС‡РµРЅРѕ: ";
 				parsing_str.PrintString();
 				cout << endl;
 			}
 			else {
 				if ((quantity == 1) && (parsed_item[0].IsTerm())) {
-					cout << endl << "Ошибка, это не целое";
+					cout << endl << "РћС€РёР±РєР°, СЌС‚Рѕ РЅРµ С†РµР»РѕРµ";
 					return false;
 				}
 
+
 				if ((quantity == 1) && (str_position != parsing_str.Length() - 1)) {
-					cout << endl << "увеличиваем символы поиска" << endl;
+					cout << endl << "СѓРІРµР»РёС‡РёРІР°РµРј СЃРёРјРІРѕР»С‹ РїРѕРёСЃРєР°" << endl;
 					parsed_item.AddSymb(parsing_str[str_position + 1]);
 					quantity = 2;
 				}
 				else {
-					cout << endl << "уменьшаем символы поиска" << endl;
+					cout << endl << "СѓРјРµРЅСЊС€Р°РµРј СЃРёРјРІРѕР»С‹ РїРѕРёСЃРєР°" << endl;
 					parsed_item.DeleteSymb(0, 1);
 					str_position++;
 					quantity = 1;
 				}
 			}
-			i = j = 0;
+			if ((quantity == 1) && (parsed_item[0] == rules[0].GetLeft())) {
+			//if (rule_num == 0)  {
+				//str_position = prev_position;
+				cout << "РїРѕСЏРІРёР»Р°СЃСЊ Р°РєСЃРёРѕРјР°!";
+				if (parsing_str.Length() == 1) return true;
+				else {
+					//
+					cout << endl << "Р·Р°РїРёСЃСЊ РІ Р»РѕРі" << endl;
+					buf_line = new LtoR_Line();
+					buf_line->SetLine(string(parsing_str), -1, -1);
+					parsing_log.AddRecordLine(buf_line);
+					//
+					cout << "РѕС‚РєР°С‚ РЅР°Р·Р°Рґ";
+					parsing_str.SetStringFromLog((*(parsing_log[parsing_log.Size() - 2])).GetCurString());
+					i = (*(parsing_log[parsing_log.Size() - 2])).GetRuleNum();
+					j = (*(parsing_log[parsing_log.Size() - 2])).GetRuleLetter();
+					if (j == rules[i].RightSize() - 2) i++;
+					else j++;
+
+					str_position = prev_position;
+					quantity = prev_quantity;
+					for (int i = 0; i < quantity; i++) {
+						parsed_item[i] = parsing_str[str_position + i];
+					};
+					cout << endl << "РџРѕР»СѓС‡РµРЅРѕ: ";
+					parsing_str.PrintString();
+					cout << endl;
+					cout << endl << "РќР°С‡РЅС‘Рј РїРѕРёСЃРє СЃ РїСЂР°РІРёР»Р°: " << i <<", " << j << endl;
+					cout << endl << "РїРѕРёСЃРє: ";
+					parsed_item.PrintString();
+					cout << endl << "РєРѕР»РёС‡РµСЃС‚РІРѕ СЃРёРјРІРѕР»РѕРІ: " << quantity;
+
+				}
+			}
+			else {
+				i = j = 0;
+			}
+			//i = j = 0;
 			found = false;
 		}
 
@@ -171,8 +365,8 @@ public:
 
 		
 		parsing_log.PrintLogltoR();
-		//???
 		return true;
 	}
+	*/
 };
 

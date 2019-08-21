@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <locale.h>
 #include <stdio.h>
 #include <conio.h>
@@ -56,13 +56,31 @@ public:
 };
 
 //-----------------------------------------------------------------
+struct RuleNum { int fir_num; int sec_num; };
 
 class RecordLine {
 protected:
 	string cur_string;
-	string next_rule;
+	RuleNum rule_num;
+	//int next_rule_num;
+	//int next_rule_letter;
 public:
 	virtual void PrintLine() = 0;
+
+	string GetCurString() {
+		return cur_string;
+	}
+
+	RuleNum GetRuleNum() {
+		//return next_rule_num;
+		return rule_num;
+	}
+/*
+	unsigned GetRuleLetter() {
+		//return next_rule_letter;
+		return rule_num.sec_num;
+	}
+	*/
 };
 
 
@@ -70,12 +88,27 @@ public:
 
 class LtoR_Line : public RecordLine {
 public:
-	void SetLine(string inp_str, string inp_rl) {
+	void SetLine(string inp_str, RuleNum inp_rnum) {
 		cur_string = inp_str;
-		next_rule = inp_rl;
+		rule_num = inp_rnum;
+		//next_rule_num = inp_rl_num;
+		//next_rule_letter = inp_rl_let;
 	}
 	void PrintLine() override {
-		cout << "������: " << cur_string << " �������: " << next_rule << endl;
+		cout << "Строка: " << cur_string;
+		if (rule_num.fir_num > -1) {
+			cout << " Правило: " << rule_num.fir_num + 1 << char(rule_num.sec_num + 224) << endl;
+		}
+		else
+			if (rule_num.sec_num == -3) {
+				cout << "       конец!" << endl;
+			}
+			else if (rule_num.sec_num == -4){
+			cout << "       разбор дальше невозможен!" << endl;
+			}
+			else {
+				cout << "       тупик!" << endl;
+			}
 	}
 };
 //-----------------------------------------------------------------
@@ -91,10 +124,16 @@ public:
 	}
 
 	void PrintLogltoR() {
-		cout << endl << endl << "���:" << endl;
+		cout << endl << endl << "Лог:" << endl;
 		for (int i = 0; i < records.size(); i++) {
 			dynamic_cast<LtoR_Line *>(records[i])->PrintLine();
 		}
+	}
+
+	RecordLine * &operator[] (int i) { return records[i]; }
+
+	int Size() {
+		return records.size();
 	}
 };
 
