@@ -95,7 +95,16 @@ public:
 		//next_rule_letter = inp_rl_let;
 	}
 	void PrintLine() override {
-		cout << "Строка: " << cur_string;
+
+		string str_for_print;
+		for (int i = 0; i < cur_string.size(); i++) {
+			if (cur_string[i] != '\n') {
+				str_for_print += cur_string[i];
+			}
+		}
+
+
+		cout << "Строка: " << str_for_print;
 		if (rule_num.fir_num > -1) {
 			cout << " Правило: " << rule_num.fir_num + 1 << char(rule_num.sec_num + 224) << endl;
 		}

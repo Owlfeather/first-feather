@@ -91,6 +91,9 @@ public:
 
 	RuleNum FindRuleNum(RuleNum rulenum = {0, 0}) {
 
+		cout << endl << "Производится разбор строки: ";
+		parsing_str.PrintString();
+
 		int rules_number = rules.size();		// суммарное число правил
 		int subrules_number;					// число подпунктов (вариантов расшифровки) одного правила
 
@@ -117,14 +120,52 @@ public:
 		LtoR_Line * buf_line;
 		cout << endl << "Осуществляется запись в лог" << endl;
 		buf_line = new LtoR_Line();
-		buf_line->SetLine(string(parsing_str), cur_rule_num);
+		//
+		string str_with_separators;
+		for (int i = 0; i < parsing_str.Length(); i++) {
+			str_with_separators += string(parsing_str[i]) + '\n';
+		}
+		//
+
+		buf_line->SetLine(str_with_separators, cur_rule_num);
 		parsing_log.AddRecordLine(buf_line);
+	}
+
+	ItemString RestoreStringFromLog(string log_str) {////////////////////////////////////////////// символы одиночные не восстанавливает
+
+		ItemString restored_str;
+		char * arr_of_char = new char[log_str.size() + 1];
+		copy(log_str.begin(), log_str.end(), arr_of_char);
+		arr_of_char[log_str.size()] = '\0';
+		char * context;
+		bool added = false;
+
+		//const char * separator = new char('\n');
+		char * item;
+		item = strtok_s(arr_of_char, "\n", &context);
+		while (item != NULL)
+		{
+			for (int i = 0; i < rules.size(); i++) {
+				if (string(item) == string(rules[i].GetLeft())) {
+					added = true;
+					restored_str.AddSymb(rules[i].GetLeft());
+				}
+			}
+			if (!added) {
+				restored_str.AddSymb(ItemSymb(item));
+			}
+			item = strtok_s(NULL, "\n", &context);
+			added = false;
+		}
+
+		return restored_str;
 	}
 
 	void Rollback() {
 
 		cout << endl << "Выполняется откат назад" << endl;
-		parsing_str.SetStringFromLog((*(parsing_log[parsing_log.Size() - 2])).GetCurString());
+		//parsing_str.SetStringFromLog((*(parsing_log[parsing_log.Size() - 2])).GetCurString());
+		parsing_str = RestoreStringFromLog((*(parsing_log[parsing_log.Size() - 2])).GetCurString());
 		RuleNum prev_rule = (*(parsing_log[parsing_log.Size() - 2])).GetRuleNum();
 
 		//if (prev_rule.sec_num == rules[prev_rule.fir_num].RightSize() - 1) prev_rule.fir_num++;
@@ -156,7 +197,7 @@ public:
 		unsigned entry_point = 0;		// указывает на следующий для добавления в parsing_item символ
 		//ItemString parsed_item({ parsing_str[entry_point] });		// разбираемый участок строки
 		parsed_item.SetString({ parsing_str[entry_point] });	// разбираемый участок строки
-		LtoR_Line * buf_line;									// буфер для записи в лог разбора
+//		LtoR_Line * buf_line;									// буфер для записи в лог разбора
 		RuleNum next_rule = { 0, 0 };
 
 		unsigned quantity = FindMaxQuantity();
@@ -209,6 +250,15 @@ public:
 
 				cout << endl << "Ошибка, неопознанный символ : ";
 				parsed_item.PrintString();
+				cout << endl;
+				okey = -1;
+				//return false;
+			}
+			if (entry_point == parsing_str.Length() - 1) {
+				//запись в лог
+				WriteToLog({ -4, -4 });
+
+				cout << endl << "Все возможные преобразования выполнены, но строка не является целым числом";
 				cout << endl;
 				okey = -1;
 				//return false;

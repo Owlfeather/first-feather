@@ -8,7 +8,7 @@ int main() {
 	setlocale(0, "russian");
 	cout << "Запуск!" << endl;
 
-	string input_str = "-45";
+	string input_str = "-4-а5";
 	
 	//ItemString ParsingString;
 	//ParsingString.SetOutputString(input_str);

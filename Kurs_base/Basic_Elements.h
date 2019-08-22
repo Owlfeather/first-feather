@@ -39,6 +39,15 @@ public:
 		term = false;
 	}
 
+	string PureContent() {
+		string result;
+		for (int i = 0; i < content.size(); i++) {
+			if ((i != 0) && (i != content.size() - 1))
+				result += content[i];
+		}
+		return result;
+	}
+
 	operator string() const {
 		return content;
 	}
