@@ -8,10 +8,8 @@ int main() {
 	setlocale(0, "russian");
 	cout << "Запуск!" << endl;
 
-	string input_str = "-4-а5";
+	string input_str = "-4--5";
 	
-	//ItemString ParsingString;
-	//ParsingString.SetOutputString(input_str);
 
 	LtoR_MethodAlg alg;
 	alg.SetRulesOfAlg();

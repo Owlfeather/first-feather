@@ -115,6 +115,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Algorithm_LtoR.cpp" />
+    <ClCompile Include="Alg_Elements.cpp" />
+    <ClCompile Include="Basic_Elements.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
