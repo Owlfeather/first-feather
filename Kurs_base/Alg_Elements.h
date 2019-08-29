@@ -65,6 +65,24 @@ public:
 
 //-----------------------------------------------------------------
 
+class TtoD_Line : public RecordLine {
+
+	string recognized;
+	string target;
+	unsigned type;
+
+public:
+
+	void SetLine(const string & rec_str, const string & pars_str, const string & targ_str, unsigned type_of_line, const RuleNum & inp_rnum);
+	void PrintLine() override;
+	string MakePrintable(string & str_with_seps);
+	string GetRecString() { return recognized; }
+	string GetTargString() { return target; }
+};
+
+//-----------------------------------------------------------------
+
+
 class ParseLog {
 	vector<RecordLine *> records;
 public:
@@ -74,6 +92,7 @@ public:
 	void AddRecordLine(RecordLine *inp_rec) { records.push_back(inp_rec); }
 	int Size() { return records.size(); }
 	void PrintLogltoR();
+	void PrintLogTtoD();
 
 	RecordLine * &operator[] (int i) { return records[i]; }
 };
@@ -93,8 +112,9 @@ public:
 	ParseAlgorithm() {}
 	ParseAlgorithm(ItemString & inp_str) : parsing_str(inp_str) {}
 
-	void SetParsingStr(ItemString inp_str) { parsing_str = inp_str; }
+	//void SetParsingStr(ItemString inp_str) { parsing_str = inp_str; }
 
+	virtual void SetParsingStr(ItemString inp_str) = 0;
 	virtual void SetRulesOfAlg() = 0;
 	virtual bool DoParse() = 0;
 };

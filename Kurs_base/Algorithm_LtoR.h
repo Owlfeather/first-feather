@@ -6,18 +6,20 @@
 #include <stdlib.h>
 #include <iostream>
 #include <vector>
-#include <tuple>
 #include "Alg_Elements.h"
 
 
 class LtoR_MethodAlg : public ParseAlgorithm {
 
-	ItemString parsed_item;
+	ItemString parsing_item;
 
 public:
 
 	void SetRulesOfAlg() override;
 	bool DoParse() override;
+	void SetParsingStr(ItemString inp_str) override;
+
+private:
 
 	unsigned FindMaxQuantity();
 

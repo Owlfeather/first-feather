@@ -91,11 +91,11 @@ RuleNum LtoR_MethodAlg::FindRuleNum(const RuleNum & rulenum)
 	for (int i = rulenum.fir_num; i < rules_number; i++) {
 		subrules_number = rules[i].RightSize();
 		for (int j = rulenum.sec_num; j < subrules_number; j++) {
-			if (parsed_item == rules[i][j]) {
+			if (parsing_item == rules[i][j]) {
 
 				cout << endl << endl << "СОВПАДЕНИЕ";
 				cout << endl << "Рассматриваемая конструкция: ";
-				parsed_item.PrintString();
+				parsing_item.PrintString();
 				cout << endl;
 				cout << "Совпадение: правило №" << i << ", пункт №" << j << " : ";
 				rules[i][j].PrintString();
@@ -168,12 +168,12 @@ void LtoR_MethodAlg::Rollback()
 	parsing_str = RestoreStringFromLog((*(parsing_log[parsing_log.Size() - 2])).GetCurString());
 	RuleNum prev_rule = (*(parsing_log[parsing_log.Size() - 2])).GetRuleNum();
 
-	parsed_item = rules[prev_rule.fir_num][prev_rule.sec_num];
+	parsing_item = rules[prev_rule.fir_num][prev_rule.sec_num];
 
 	cout << endl << "Разбираемая строка: ";
 	parsing_str.PrintString();
 	cout << endl << "Будет выполняться поиск конструкции: ";
-	parsed_item.PrintString();
+	parsing_item.PrintString();
 	cout << endl;
 }
 
@@ -190,7 +190,7 @@ bool LtoR_MethodAlg::DoParse()
 {
 	int okey = 0;
 	unsigned entry_point = 0;		// указывает на следующий для добавления в parsing_item символ
-	parsed_item.SetString({ parsing_str[entry_point] });	// разбираемый участок строки
+	parsing_item.SetString({ parsing_str[entry_point] });	// разбираемый участок строки
 	RuleNum next_rule = { 0, 0 };
 
 	unsigned quantity = FindMaxQuantity();
@@ -201,7 +201,7 @@ bool LtoR_MethodAlg::DoParse()
 		if (rule_num.fir_num != -1) {		// Если правило нашлось
 
 			cout << endl << "Замена: ";
-			parsed_item.PrintString();
+			parsing_item.PrintString();
 			cout << " на ";
 			cout << string(rules[rule_num.fir_num].GetLeft());
 
@@ -210,8 +210,8 @@ bool LtoR_MethodAlg::DoParse()
 			//
 
 			// замена строк
-			TransformAccordingRule(rules[rule_num.fir_num].GetLeft(), entry_point, parsed_item.Length());
-			parsed_item.SetString({ parsing_str[0] });
+			TransformAccordingRule(rules[rule_num.fir_num].GetLeft(), entry_point, parsing_item.Length());
+			parsing_item.SetString({ parsing_str[0] });
 			//
 
 			if (rule_num.fir_num == 0) {
@@ -236,13 +236,13 @@ bool LtoR_MethodAlg::DoParse()
 			}
 		}
 		else { // если правило не нашлось
-			if ((parsed_item.Length() == 1) && (parsed_item[0].IsTerm())) {
+			if ((parsing_item.Length() == 1) && (parsing_item[0].IsTerm())) {
 
 				//запись в лог
 				WriteToLog({ -4, -4 });
 
 				cout << endl << "Ошибка, неопознанный символ : ";
-				parsed_item.PrintString();
+				parsing_item.PrintString();
 				cout << endl;
 				okey = -1;
 				//return false;
@@ -256,11 +256,11 @@ bool LtoR_MethodAlg::DoParse()
 				okey = -1;
 				//return false;
 			}
-			if ((parsed_item.Length() < quantity) && (entry_point != parsing_str.Length() - 1)) {
-				parsed_item.AddSymb(parsing_str[entry_point + parsed_item.Length()]);
+			if ((parsing_item.Length() < quantity) && (entry_point != parsing_str.Length() - 1)) {
+				parsing_item.AddSymb(parsing_str[entry_point + parsing_item.Length()]);
 			}
 			else {
-				parsed_item.DeleteSymb(0, 1);
+				parsing_item.DeleteSymb(0, 1);
 				entry_point++;
 			}
 			next_rule = { 0, 0 };
@@ -269,4 +269,9 @@ bool LtoR_MethodAlg::DoParse()
 	}
 	parsing_log.PrintLogltoR();
 	return true;
+}
+
+void LtoR_MethodAlg::SetParsingStr(ItemString inp_str)
+{
+	parsing_str = inp_str;
 }

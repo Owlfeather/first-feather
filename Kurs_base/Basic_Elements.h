@@ -22,7 +22,6 @@ public:
 	ItemSymb(const string inp_cont, bool inp_term = true) : content(inp_cont), term(inp_term) {}
 
 	bool IsTerm() const { return term; }
-	void MakeNonterminal() { term = false; }
 
 	void SetSymb(const string & inp_cont, bool inp_term = true);
 	void SetSymb(const char & inp_cont, bool inp_term = true);
@@ -48,7 +47,17 @@ public:
 	int Length() { return cur_string.size(); }
 	void PrintString();
 
-	void AddSymb(const ItemSymb & inp_symb) { cur_string.push_back(inp_symb); }
+	void AddSymb(const ItemSymb & inp_symb, const int pos = -1) 
+	{ 
+		if (pos == -1) {
+			cur_string.push_back(inp_symb);
+		}
+		else {
+			cur_string.insert(cur_string.begin() + pos, inp_symb);
+		}
+
+	}
+
 	void DeleteSymb(const int & first, const int & quantity);
 	
 	operator string() const; 
