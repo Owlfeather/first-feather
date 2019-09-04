@@ -30,7 +30,6 @@ void TtoD_MethodAlg::SetRulesOfAlg()
 	buf_str.push_back(ItemString(buf_symb));	// записали вариант 1
 
 	buf_symb.pop_back();						// <цифра>
-	//buf_symb = { c_number };					// <цифра>
 	buf_str.push_back(ItemString(buf_symb));	// записали вариант 2
 
 	rule.SetRule(c_unsigned_int, buf_str);		// ПРАВИЛО
@@ -71,6 +70,7 @@ bool TtoD_MethodAlg::DoParse()
 	bool okey = true;
 	RuleNum next_rule;
 	RuleNum new_rule;
+	ItemSymb end("end");
 	recognized_str.AddSymb(ItemSymb(""));
 	bool rollback_happened = false;
 	
@@ -82,32 +82,32 @@ bool TtoD_MethodAlg::DoParse()
 	cout << endl;
 	
 	while (okey) {
-		//if (rollback_happened) {
-			//next_rule = new_rule;
-		//	rollback_happened = false;
-		//}
-		//else {
+		if (rollback_happened) {
+			next_rule = new_rule;
+			rollback_happened = false;
+		}
+		else {
 			next_rule = FindRuleNum();
-		//}
+		}
 		TransformAccordingRule(next_rule);
 		if (target_str[0].IsTerm()) {
 
-			if (target_str[0] == parsing_str[0]) {
-				//убираем по символу и проверяем, не дошли ли до конца
+			if (!FindCorrectTerm(next_rule)) {
+				// нужен откат
+				new_rule = Rollback();
+				rollback_happened = true;
+				if (new_rule.fir_num == -1) { // если больше откат выполнить не удастся
+					okey = false;
+				}
 			}
 			else {
-				if (!FindCorrectTerm(next_rule)) {
-					// нужен откат
-					//new_rule = Rollback();
-					//rollback_happened = true;
-					//if (new_rule.fir_num == -1) { // если больше откат выполнить не удастся
-						okey = false;
-					//}
+				if ((parsing_str[0] == end) && (target_str[0] == end)) {
+					okey = false;
 				}
 			}
 		}
 		else WriteToLog(2, next_rule);
-		//WriteToLog(2, next_rule);
+
 		cout << endl << "Разбираемая строка: ";
 		parsing_str.PrintString();
 		cout << endl << "Строка-цель: ";
@@ -208,21 +208,31 @@ RuleNum TtoD_MethodAlg::Rollback()
 	RuleNum rollback_info;
 	unsigned required_ind;
 
+	cout << endl << "Последняя строка в логе: " << endl;
+	dynamic_cast<TtoD_Line *>(parsing_log[i])->PrintLine();
+
 	while ((!found) && (i != -1)) {
 		rollback_info = parsing_log[i]->GetRuleNum();
-		if ((rollback_info.fir_num = -1) && (rollback_info.sec_num < 1)) {
+
+		cout << endl << rollback_info.fir_num << ", " << rollback_info.sec_num << endl;
+
+		if ((rollback_info.fir_num == -1) && (rollback_info.sec_num < 1)) {
 			// откат возможен
 			found = true;
 			required_ind = i;
+
+			cout << endl << "Возврат к строке: " << endl;
+			dynamic_cast<TtoD_Line *>(parsing_log[required_ind])->PrintLine();
 		}
 		i--;
 	}
 
 	if (found) {
-		parsing_str = RestoreStringFromLog((*(parsing_log[required_ind-1])).GetCurString());
+		parsing_str = RestoreStringFromLog((*(parsing_log[required_ind])).GetCurString());
 
-		recognized_str = RestoreStringFromLog(dynamic_cast<TtoD_Line *>(parsing_log[required_ind-1])->GetRecString());
-		target_str = RestoreStringFromLog(dynamic_cast<TtoD_Line *>(parsing_log[required_ind-1])->GetTargString());
+		recognized_str = RestoreStringFromLog(dynamic_cast<TtoD_Line *>(parsing_log[required_ind])->GetRecString());
+		target_str = RestoreStringFromLog(dynamic_cast<TtoD_Line *>(parsing_log[required_ind])->GetTargString());
+		dynamic_cast<TtoD_Line *>(parsing_log[required_ind])->MarkRollback();
 
 		cout << endl << "восстановленная строка распознанного: ";
 		recognized_str.PrintString();
