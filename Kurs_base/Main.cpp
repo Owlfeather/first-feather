@@ -11,17 +11,18 @@ int main() {
 
 	string input_str = "-45";
 	
-	/*
+	
 	LtoR_MethodAlg alg1;
 	alg1.SetRulesOfAlg();
 	alg1.SetParsingStr(input_str);
 	alg1.DoParse();
-	*/
-
+	
+	/*
 	TtoD_MethodAlg alg2;
 	alg2.SetRulesOfAlg();
 	alg2.SetParsingStr(input_str);
 	alg2.DoParse();
+	*/
 
 
 

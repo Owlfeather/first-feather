@@ -75,6 +75,7 @@ public:
 
 	void SetLine(const string & rec_str, const string & pars_str, const string & targ_str, unsigned type_of_line, const RuleNum & inp_rnum);
 	void PrintLine() override;
+
 	void MarkRollback() { rule_num.sec_num++; }
 	string MakePrintable(string & str_with_seps);
 	string GetRecString() { return recognized; }
