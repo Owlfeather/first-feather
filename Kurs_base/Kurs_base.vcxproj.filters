@@ -30,6 +30,9 @@
     <ClCompile Include="Algorithm_TtoD.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="Algorithm_LLk_TtoD.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Algorithm_LtoR.h">
@@ -42,6 +45,9 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="Algorithm_TtoD.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Algorithm_LLk_TtoD.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

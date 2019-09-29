@@ -88,6 +88,17 @@ bool TtoD_MethodAlg::DoParse()
 		}
 		else {
 			next_rule = FindRuleNum();
+			///
+			if (next_rule.fir_num == -5) {
+				cout << "Ошибка, разбор дальше невозможен" << endl;
+				okey = false;
+				/////// сделать корректную запись
+				WriteToLog(3, next_rule);
+				parsing_log.PrintLogTtoD();
+				return true;
+				///
+			}
+			
 		}
 		TransformAccordingRule(next_rule);
 		if (target_str[0].IsTerm()) {
@@ -138,6 +149,10 @@ RuleNum TtoD_MethodAlg::FindRuleNum() // используется для пои�
 			return RuleNum({ i, 0 });	// берём первое возможное раскрытие
 		}
 	}
+	///
+	return RuleNum({ -5,-5 }); // возврат с ошибкой
+	///
+
 	// эта функция корректна только тогда, когда в target_str[0] - нетерминал
 }
 
