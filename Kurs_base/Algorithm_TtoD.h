@@ -33,7 +33,7 @@ private:
 	void TransformAccordingRule(const RuleNum & rulenum);
 	RuleNum Rollback();
 
-	void WriteToLog(const unsigned & type, const RuleNum & cur_rule_num = {-1, 0});
+	void WriteToLog(const unsigned & type, const TypeOfTtoDLine & line_type,  const RuleNum & cur_rule_num = {-1, 0});
 	ItemString RestoreStringFromLog(const string & log_str);
 
 	string MakeStrForLog(ItemString & orig_str);

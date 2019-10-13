@@ -75,7 +75,7 @@ bool TtoD_MethodAlg::DoParse()
 	bool rollback_happened = false;
 	
 	target_str.SetString({ rules[0].GetLeft(), ItemSymb("end") }); // <целое>end
-	WriteToLog(1);
+	WriteToLog(1, TypeOfTtoDLine::STATEMENT);
 
 	cout << "Строка-цель: ";
 	target_str.PrintString();
@@ -88,17 +88,38 @@ bool TtoD_MethodAlg::DoParse()
 		}
 		else {
 			next_rule = FindRuleNum();
-			///
+
+			//// если в строке-цели ничего не осталось, но разбор не окончен
 			if (next_rule.fir_num == -5) {
-				cout << "Ошибка, разбор дальше невозможен" << endl;
-				okey = false;
-				/////// сделать корректную запись
-				WriteToLog(3, next_rule);
-				parsing_log.PrintLogTtoD();
-				return true;
+
+				if ((target_str[0] == end) && (parsing_str.Length() != 1)) {
+					// нужен откат
+					new_rule = Rollback();
+					rollback_happened = true;
+
+					if (new_rule.fir_num == -1) { // если больше откат выполнить не удастся
+						cout << "\nБольше откат выполнить невозможно" << endl;
+						okey = false;
+					}
+				}
+			////
+				else {
+			///
+			//if (next_rule.fir_num == -5) {
+					cout << "Ошибка, разбор дальше невозможен" << endl;
+					okey = false;
+					/////// сделать корректную запись
+					WriteToLog(3, TypeOfTtoDLine::RULE_NOT_FIT, next_rule);
+					parsing_log.PrintLogTtoD();
+					return true;
+				}
 				///
 			}
 			
+		}
+		if (rollback_happened) {
+			next_rule = new_rule;
+			rollback_happened = false;
 		}
 		TransformAccordingRule(next_rule);
 		if (target_str[0].IsTerm()) {
@@ -119,7 +140,7 @@ bool TtoD_MethodAlg::DoParse()
 				}
 			}
 		}
-		else WriteToLog(2, next_rule);
+		else WriteToLog(2, TypeOfTtoDLine::ROLLB_POSS, next_rule);
 
 		cout << endl << "Разбираемая строка: ";
 		parsing_str.PrintString();
@@ -168,21 +189,21 @@ bool TtoD_MethodAlg::FindCorrectTerm(const RuleNum & rulenum)
 		if (correct_term == parsing_str[0]) {
 			cout << endl << "Правило " << rulenum.fir_num + 1 << ", " << i + 1 << " подошло" << endl;
 			if (i > 0) {
-				WriteToLog(3, { rulenum.fir_num , i - 1 });
+				WriteToLog(3, TypeOfTtoDLine::RULE_NOT_FIT, { rulenum.fir_num, i - 1 });
 			}
 			//запись в лог о несовпадениях (если они есть) типа 3
 			target_str.DeleteSymb(0, 1); // трём первый символ
 			target_str.AddSymb(correct_term, 0); // вставляем в начало нужный
-			WriteToLog(4, { rulenum.fir_num , i });
+			WriteToLog(4, TypeOfTtoDLine::RULE_FIT, { rulenum.fir_num , i });
 			//запись в лог типа 4
 			RemoveMatchingSymbs();
-			WriteToLog(1);
+			WriteToLog(1, TypeOfTtoDLine::STATEMENT);
 			// запись в лог типа 1
 			return true;	// найти символ удалось
 		}
 		cout << endl << "Правило " << rulenum.fir_num + 1 << ", " << i + 1 << " не подошло" << endl;
 	}
-	WriteToLog(3, { rulenum.fir_num , int(size_of_rule) });	// не нашлось, запись в лог типа 4
+	WriteToLog(3,TypeOfTtoDLine::RULE_NOT_FIT, { rulenum.fir_num , int(size_of_rule) });	// не нашлось, запись в лог типа 4
 	//если не удалось - нужен откат
 	return false;
 }
@@ -214,7 +235,7 @@ void TtoD_MethodAlg::TransformAccordingRule(const RuleNum & rulenum)
 	target_str.PrintString();
 	cout << endl;
 }
-
+/*
 RuleNum TtoD_MethodAlg::Rollback()
 {
 	cout << endl << "Выполняется откат назад" << endl;
@@ -224,10 +245,12 @@ RuleNum TtoD_MethodAlg::Rollback()
 	int i = parsing_log.Size() - 1;
 	RuleNum rollback_info;
 	unsigned required_ind;
+	TypeOfTtoDLine cur_line_type;
 
 	cout << endl << "Последняя строка в логе: " << endl;
 	dynamic_cast<TtoD_Line *>(parsing_log[i])->PrintLine();
 
+	/*
 	while ((!found) && (i != -1)) {
 		rollback_info = parsing_log[i]->GetRuleNum();
 
@@ -243,6 +266,24 @@ RuleNum TtoD_MethodAlg::Rollback()
 		}
 		i--;
 	}
+	
+
+	while ((!found) && (i != -1)) {
+
+		rollback_info = parsing_log[i]->GetRuleNum();
+		cur_line_type = dynamic_cast<TtoD_Line*>(parsing_log[i])->GetTypeOfLine();
+
+		if (cur_line_type == TypeOfTtoDLine::ROLLB_POSS) {
+			// откат возможен
+			found = true;
+			required_ind = i - 2;
+
+			cout << endl << "Возврат к строке: " << endl;
+			dynamic_cast<TtoD_Line*>(parsing_log[required_ind])->PrintLine();
+
+		}
+		i--;
+	}
 
 	if (found) {
 		parsing_str = RestoreStringFromLog((*(parsing_log[required_ind])).GetCurString());
@@ -250,6 +291,7 @@ RuleNum TtoD_MethodAlg::Rollback()
 		recognized_str = RestoreStringFromLog(dynamic_cast<TtoD_Line *>(parsing_log[required_ind])->GetRecString());
 		target_str = RestoreStringFromLog(dynamic_cast<TtoD_Line *>(parsing_log[required_ind])->GetTargString());
 		dynamic_cast<TtoD_Line *>(parsing_log[required_ind])->MarkRollback();
+		dynamic_cast<TtoD_Line*>(parsing_log[required_ind + 2])->TypeMarkRollback();
 
 		cout << endl << "восстановленная строка распознанного: ";
 		recognized_str.PrintString();
@@ -261,24 +303,133 @@ RuleNum TtoD_MethodAlg::Rollback()
 
 
 		RuleNum next_rule = (*(parsing_log[required_ind + 1])).GetRuleNum();
-		next_rule.sec_num += rollback_info.sec_num + 1;
+
+		cout << "Строка, откуда берём правило: ";
+		parsing_log[required_ind + 1]->PrintLine();
+
+		//next_rule.sec_num += rollback_info.sec_num + 1;
+		next_rule.sec_num += 1;
 			return next_rule;
 	}
 	return RuleNum({-1, -1});
 	//parsing_str = RestoreStringFromLog((*(parsing_log)))
 }
+*/
 
-void TtoD_MethodAlg::WriteToLog(const unsigned & type, const RuleNum & cur_rule_num)
+RuleNum TtoD_MethodAlg::Rollback()
+{
+	cout << endl << "Выполняется откат назад" << endl;
+
+	bool found = false;
+	int i = parsing_log.Size() - 1; //последняя строка
+	RuleNum rollback_info;
+	unsigned required_ind;
+	TypeOfTtoDLine cur_line_type;
+
+	//cout << endl << "Последняя строка в логе: " << endl;
+	//dynamic_cast<TtoD_Line*>(parsing_log[i])->PrintLine();
+
+	while ((!found) && (i != 0)) {
+
+		rollback_info = parsing_log[i]->GetRuleNum();
+		cur_line_type = dynamic_cast<TtoD_Line*>(parsing_log[i])->GetTypeOfLine();
+
+
+		if (cur_line_type == TypeOfTtoDLine::ROLLB_POSS) {
+
+			cout << "\n Строка подошла: ";
+			dynamic_cast<TtoD_Line*>(parsing_log[i])->PrintLine();
+			cout << "\n Информация для отката: ";
+			cout << rollback_info.fir_num << ", " << rollback_info.sec_num << endl;
+
+			// откат возможен
+			found = true;
+			required_ind = i - 1;
+			dynamic_cast<TtoD_Line*>(parsing_log[i])->TypeMarkRollback();
+
+			cout << endl << "Возврат к строке: " << endl;
+			dynamic_cast<TtoD_Line*>(parsing_log[required_ind])->PrintLine();
+
+		}
+		i--;
+	}
+
+	if (found) {
+
+		parsing_str = RestoreStringFromLog((*(parsing_log[required_ind])).GetCurString());
+		recognized_str = RestoreStringFromLog(dynamic_cast<TtoD_Line*>(parsing_log[required_ind])->GetRecString());
+		target_str = RestoreStringFromLog(dynamic_cast<TtoD_Line*>(parsing_log[required_ind])->GetTargString());
+
+		//dynamic_cast<TtoD_Line*>(parsing_log[required_ind + 1])->MarkRollback();
+		//dynamic_cast<TtoD_Line*>(parsing_log[required_ind + 2])->TypeMarkRollback();
+
+		cout << endl << "восстановленная строка распознанного: ";
+		recognized_str.PrintString();
+		cout << endl << "восстановленная строка разбора: ";
+		parsing_str.PrintString();
+		cout << endl << "восстановленная строка цели: ";
+		target_str.PrintString();
+
+
+		RuleNum next_rule = rollback_info;
+			//RuleNum next_rule = (*(parsing_log[required_ind + 1])).GetRuleNum();
+
+		//cout << "Строка, откуда берём правило: ";
+		//parsing_log[required_ind]->PrintLine();
+
+		//next_rule.sec_num += rollback_info.sec_num + 1;
+		next_rule.sec_num += 1;
+		return next_rule;
+	}
+	return RuleNum({ -1, -1 });
+	//parsing_str = RestoreStringFromLog((*(parsing_log)))
+}
+
+void TtoD_MethodAlg::WriteToLog(const unsigned & type, const TypeOfTtoDLine& line_type, const RuleNum & cur_rule_num)
 {
 	TtoD_Line * buf_line;
 	cout << "Осуществляется запись в лог" << endl;
 	buf_line = new TtoD_Line();
+	TypeOfTtoDLine sp_type;
 
 	string rec_str = MakeStrForLog(recognized_str);
 	string pars_str = MakeStrForLog(parsing_str);
 	string targ_str = MakeStrForLog(target_str);
+	sp_type = line_type;
 
-	buf_line->SetLine(rec_str, pars_str, targ_str, type, cur_rule_num);
+	if ((line_type == TypeOfTtoDLine::ROLLB_POSS) && (cur_rule_num.sec_num == 1)) {
+		sp_type = TypeOfTtoDLine::ROLLB_IMPOSS;
+	}
+
+
+	if ((line_type == TypeOfTtoDLine::RULE_NOT_FIT) && (cur_rule_num.sec_num != rules[cur_rule_num.fir_num].RightSize())) {
+		if (cur_rule_num.fir_num != 3) {
+		targ_str.insert(targ_str.begin() + 1, '.');
+		targ_str.insert(targ_str.begin() + 2, '.');
+		targ_str.insert(targ_str.begin() + 3, '.');
+		char buf = (cur_rule_num.sec_num) + '0';
+		targ_str.insert(targ_str.begin() + 4, buf );
+		}
+
+	}
+
+
+	if ((line_type == TypeOfTtoDLine::RULE_NOT_FIT) && (cur_rule_num.sec_num == rules[cur_rule_num.fir_num].RightSize())) {
+		targ_str.insert(targ_str.begin() + 1, '.');
+		targ_str.insert(targ_str.begin() + 2, '.');
+		targ_str.insert(targ_str.begin() + 3, '.');
+
+		char buf;
+		if (cur_rule_num.fir_num == 3) {
+			buf = '-';
+		}
+		else {
+			buf = '9';
+		}
+		targ_str.insert(targ_str.begin() + 4, buf);
+	}
+
+	buf_line->SetLine(rec_str, pars_str, targ_str, type, sp_type, cur_rule_num);
 	parsing_log.AddRecordLine(buf_line);
 
 

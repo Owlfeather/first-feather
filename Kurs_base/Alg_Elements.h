@@ -70,16 +70,21 @@ class TtoD_Line : public RecordLine {
 	string recognized;
 	string target;
 	unsigned type;
+	TypeOfTtoDLine type_of_line;
 
 public:
 
-	void SetLine(const string & rec_str, const string & pars_str, const string & targ_str, unsigned type_of_line, const RuleNum & inp_rnum);
+	void SetLine(const string & rec_str, const string & pars_str, 
+		const string & targ_str, unsigned type_of_l, 
+		TypeOfTtoDLine line_type, const RuleNum & inp_rnum);
 	void PrintLine() override;
 
 	void MarkRollback() { rule_num.sec_num++; }
+	void TypeMarkRollback() { type_of_line = TypeOfTtoDLine::ROLLB_IMPOSS; }
 	string MakePrintable(string & str_with_seps);
 	string GetRecString() { return recognized; }
 	string GetTargString() { return target; }
+	TypeOfTtoDLine& GetTypeOfLine() { return type_of_line; }
 };
 
 //-----------------------------------------------------------------

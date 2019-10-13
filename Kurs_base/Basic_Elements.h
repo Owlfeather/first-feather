@@ -67,5 +67,12 @@ public:
 };
 
 
-
+enum TypeOfTtoDLine
+{
+	STATEMENT,
+	ROLLB_POSS,
+	ROLLB_IMPOSS,
+	RULE_NOT_FIT,
+	RULE_FIT
+};
 

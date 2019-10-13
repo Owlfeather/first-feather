@@ -10,7 +10,7 @@ int main() {
 	setlocale(0, "russian");
 	cout << "Запуск!" << endl;
 
-	string input_str = "-н5";
+	string input_str = "45";
 	
 	/*
 	LtoR_MethodAlg alg1;
