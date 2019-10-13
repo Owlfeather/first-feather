@@ -87,6 +87,7 @@ void TtoD_Line::PrintLine()
 	cout << endl << "Распознано: " << MakePrintable(recognized);
 	cout << " Строка: " << MakePrintable(cur_string);
 	cout << " Цель: " << MakePrintable(target);
+	cout << " Тип: " << type;
 	cout << "   ";
 	switch (type)
 	{

@@ -108,11 +108,13 @@ bool TtoD_MethodAlg::DoParse()
 				new_rule = Rollback();
 				rollback_happened = true;
 				if (new_rule.fir_num == -1) { // если больше откат выполнить не удастся
+					cout << "\nБольше откат выполнить невозможно" << endl;
 					okey = false;
 				}
 			}
 			else {
 				if ((parsing_str[0] == end) && (target_str[0] == end)) {
+					cout << "\nРазбор завершён успешно" << endl;
 					okey = false;
 				}
 			}
@@ -229,7 +231,7 @@ RuleNum TtoD_MethodAlg::Rollback()
 	while ((!found) && (i != -1)) {
 		rollback_info = parsing_log[i]->GetRuleNum();
 
-		cout << endl << rollback_info.fir_num << ", " << rollback_info.sec_num << endl;
+		cout << endl <<"Данные строки: "<< rollback_info.fir_num << ", " << rollback_info.sec_num << endl;
 
 		if ((rollback_info.fir_num == -1) && (rollback_info.sec_num < 1)) {
 			// откат возможен
