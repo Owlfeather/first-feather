@@ -69,6 +69,16 @@ void ParseLog::PrintLogTtoD()
 	}
 }
 
+void ParseLog::PrintLogLLk()
+{
+	cout << endl << endl << "Лог:" << endl;
+	for (int i = 0; i < records.size(); i++) {
+		dynamic_cast<LLk_TtoD_Line*>(records[i])->PrintLine();
+	}
+}
+
+
+
 
 
 //---------------------TtoD_Line---------------------
@@ -157,5 +167,44 @@ string TtoD_Line::MakePrintable(string & str_with_seps)
 }
 
 
+//---------------------LLk_TtoD_Line---------------------
 
 
+void LLk_TtoD_Line::SetLine(const string& pars_str, const string& st_str, const RuleNum& inp_rnum)
+{
+	cur_string = pars_str;
+	stack_str = st_str;
+	rule_num = inp_rnum;
+}
+
+void LLk_TtoD_Line::PrintLine()
+{
+	cout << endl << "Строка: " << cur_string;
+	cout << " Стек: " << stack_str;
+
+
+	if (rule_num.fir_num > 0) {
+		if ((rule_num.fir_num == 1) || (rule_num.fir_num == 3)) {
+			cout << " Правило: " << rule_num.fir_num + 1;
+		}
+		else {
+			cout << " Правило: " << rule_num.fir_num + 1 << char(rule_num.sec_num + 224);
+		}
+	}
+	else {
+		switch (rule_num.fir_num)
+		{
+		case -1:
+			cout << " Некорректный символ, разбор завершён";
+			break;
+		case -3:
+			cout << "";
+			break;
+		case -10:
+			cout << " Разбор завершён";
+			break;
+		}
+	}
+
+
+}

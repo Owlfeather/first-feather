@@ -153,6 +153,7 @@ bool TtoD_LLk_MethodAlg::FindCorrectTerm(const RuleNum& rulenum)
 
 	ItemSymb empty("e");
 	bool may_be_deleted = false;
+	unsigned del_num;
 	// символ уберётся гарантированно
 	//RuleNum cur_rulenum = rulenum
 
@@ -165,12 +166,17 @@ bool TtoD_LLk_MethodAlg::FindCorrectTerm(const RuleNum& rulenum)
 
 		if (rules[rulenum.fir_num][rulenum.sec_num + i][0] == empty) {
 			may_be_deleted = true;
+			del_num = rulenum.fir_num;
 		}
 
 		if (parsing_str[0] == rules[rulenum.fir_num][rulenum.sec_num + i][0]) {
+
+			//WriteToLog({ rulenum.fir_num,rulenum.sec_num + i });
+
 			TransformAccordingRule({ rulenum.fir_num , rulenum.sec_num + i });
 
 			/// запись в лог с не убранными
+			
 			cout << endl;
 			cout << "СОВПАДЕНИЕ ";
 			cout << endl;
@@ -201,6 +207,9 @@ bool TtoD_LLk_MethodAlg::FindCorrectTerm(const RuleNum& rulenum)
 	
 	if (may_be_deleted) {
 		// запись в лог с е
+
+		WriteToLog({ rulenum.fir_num, 5 });
+
 		cout << endl;
 		cout << "Совпадений не найдено, но можно удалить, удаляем первый символ из target_str: ";
 		cout << endl << "Строка-цель до удаления: ";
@@ -225,7 +234,8 @@ bool TtoD_LLk_MethodAlg::FindCorrectTerm(const RuleNum& rulenum)
 
 void TtoD_LLk_MethodAlg::RemoveMatchingSymbs()
 {
-	recognized_str.AddSymb(parsing_str[0]);
+	//recognized_str.AddSymb(parsing_str[0]);
+	WriteToLog({ -3, 0 });
 	parsing_str.DeleteSymb(0, 1);
 	target_str.DeleteSymb(0, 1);
 
@@ -233,6 +243,7 @@ void TtoD_LLk_MethodAlg::RemoveMatchingSymbs()
 	parsing_str.PrintString();
 	cout << endl << "Строка-цель после удаления: ";
 	target_str.PrintString();
+
 }
 
 void TtoD_LLk_MethodAlg::TransformAccordingRule(const RuleNum& rulenum)
@@ -244,6 +255,8 @@ void TtoD_LLk_MethodAlg::TransformAccordingRule(const RuleNum& rulenum)
 	substr.PrintString();
 	cout << endl;
 
+	WriteToLog(rulenum);
+
 	target_str[0] = substr[0];
 	if (substr.Length() > 1) {
 		for (int i = 1; i < substr.Length(); i++) {
@@ -253,6 +266,18 @@ void TtoD_LLk_MethodAlg::TransformAccordingRule(const RuleNum& rulenum)
 	cout << "Полученная строка-цель: ";
 	target_str.PrintString();
 	cout << endl;
+	
+}
+
+void TtoD_LLk_MethodAlg::WriteToLog(const RuleNum& cur_rule_num)
+{
+	LLk_TtoD_Line* buf_line;
+	cout << "Осуществляется запись в лог" << endl;
+	buf_line = new LLk_TtoD_Line();
+	
+
+	buf_line->SetLine(parsing_str, target_str, cur_rule_num);
+	parsing_log.AddRecordLine(buf_line);
 }
 
 bool TtoD_LLk_MethodAlg::DoParse()
@@ -262,7 +287,7 @@ bool TtoD_LLk_MethodAlg::DoParse()
 	RuleNum next_rule;
 	RuleNum new_rule;
 	ItemSymb end("end");
-	recognized_str.AddSymb(ItemSymb(""));
+	//recognized_str.AddSymb(ItemSymb(""));
 
 	target_str.SetString({ rules[1].GetLeft(), ItemSymb("end") }); // <выражение>end
 	// запись в лог
@@ -299,6 +324,7 @@ bool TtoD_LLk_MethodAlg::DoParse()
 					&& (parsing_str.Length() == 1)
 					&& (target_str[0] == end)) {
 					cout << endl << "Разбор завершён";
+					WriteToLog({ -10, 0 });
 					okey = false;
 				}
 			}
@@ -313,6 +339,8 @@ bool TtoD_LLk_MethodAlg::DoParse()
 
 					// запись в лог о некорректном символе
 					cout << endl << "Некорректный символ, дальнейший разбор невозможен" << endl;
+
+					WriteToLog();
 					okey = false;
 				}
 
@@ -320,16 +348,20 @@ bool TtoD_LLk_MethodAlg::DoParse()
 					&& (parsing_str.Length() == 1)
 					&& (target_str[0] == end)) {
 					cout << endl << "Разбор завершён"<< endl;
+					WriteToLog({ -10, 0 });
 					okey = false;
 				}
 			}
 			else {
+				//WriteToLog(next_rule);
 				TransformAccordingRule(next_rule); // корректируем target_str
 			}
 		}
 		
 		// Иначе - начинаем сначала
 	}
+
+	parsing_log.PrintLogLLk();
 
 	return true;
 }

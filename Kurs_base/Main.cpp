@@ -10,7 +10,7 @@ int main() {
 	setlocale(0, "russian");
 	cout << "Запуск!" << endl;
 
-	string input_str = "45";
+	string input_str = "a+(b--n)";
 	
 	/*
 	LtoR_MethodAlg alg1;
@@ -21,14 +21,14 @@ int main() {
 	alg1.SetParsingStr(input_str);
 	alg1.DoParse();
 	//*/
-	///*
+	/*
 	TtoD_MethodAlg alg2;
 	alg2.SetRulesOfAlg();
 	alg2.SetParsingStr(input_str);
 	alg2.DoParse();
-	//*/
+	*/
 
-	/*
+	///*
 	TtoD_LLk_MethodAlg alg3;
 	alg3.SetRulesOfAlg();
 	alg3.SetParsingStr(input_str);

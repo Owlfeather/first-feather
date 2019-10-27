@@ -99,7 +99,9 @@ bool TtoD_MethodAlg::DoParse()
 
 					if (new_rule.fir_num == -1) { // если больше откат выполнить не удастся
 						cout << "\nБольше откат выполнить невозможно" << endl;
+						//rollback_happened = false;
 						okey = false;
+						return true;
 					}
 				}
 			////
@@ -117,6 +119,7 @@ bool TtoD_MethodAlg::DoParse()
 			}
 			
 		}
+
 		if (rollback_happened) {
 			next_rule = new_rule;
 			rollback_happened = false;
@@ -431,8 +434,6 @@ void TtoD_MethodAlg::WriteToLog(const unsigned & type, const TypeOfTtoDLine& lin
 
 	buf_line->SetLine(rec_str, pars_str, targ_str, type, sp_type, cur_rule_num);
 	parsing_log.AddRecordLine(buf_line);
-
-
 
 }
 

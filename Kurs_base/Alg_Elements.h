@@ -89,6 +89,30 @@ public:
 
 //-----------------------------------------------------------------
 
+class LLk_TtoD_Line : public RecordLine {
+
+	string stack_str;
+	//unsigned type;
+	//TypeOfTtoDLine type_of_line;
+
+public:
+
+	void SetLine(const string& pars_str,
+		const string& st_str, const RuleNum& inp_rnum);
+	void PrintLine() override;
+
+	string GetStackString() { return stack_str; }
+
+	//void MarkRollback() { rule_num.sec_num++; }
+	//void TypeMarkRollback() { type_of_line = TypeOfTtoDLine::ROLLB_IMPOSS; }
+	//string MakePrintable(string& str_with_seps);
+	//string GetRecString() { return recognized; }
+	
+	//TypeOfTtoDLine& GetTypeOfLine() { return type_of_line; }
+};
+
+//-----------------------------------------------------------------
+
 
 class ParseLog {
 	vector<RecordLine *> records;
@@ -100,6 +124,7 @@ public:
 	int Size() { return records.size(); }
 	void PrintLogltoR();
 	void PrintLogTtoD();
+	void PrintLogLLk();
 
 	RecordLine * &operator[] (int i) { return records[i]; }
 };
