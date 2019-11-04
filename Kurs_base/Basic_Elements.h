@@ -76,3 +76,11 @@ enum TypeOfTtoDLine
 	RULE_FIT
 };
 
+enum TypeOfRelation
+{
+	CARRY,		// перенос
+	CONV,		// свёртка
+	CONV_BR,	// свёртка скобок
+	ERROR,
+	EXIT
+};

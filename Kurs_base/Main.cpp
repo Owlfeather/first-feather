@@ -3,6 +3,8 @@
 #include "Algorithm_TtoD.h"
 #include "Alg_Elements.h"
 #include "Algorithm_LLk_TtoD.h"
+#include "Algorithm_LRk_Stack.h"
+
 
 //************************Программа************************
 
@@ -10,7 +12,8 @@ int main() {
 	setlocale(0, "russian");
 	cout << "Запуск!" << endl;
 
-	string input_str = "a+(b--n)";
+	//string input_str = "d+c*(a+b)";
+	string input_str = "()";
 	
 	/*
 	LtoR_MethodAlg alg1;
@@ -28,12 +31,17 @@ int main() {
 	alg2.DoParse();
 	*/
 
-	///*
+	/*
 	TtoD_LLk_MethodAlg alg3;
 	alg3.SetRulesOfAlg();
 	alg3.SetParsingStr(input_str);
 	alg3.DoParse();
 	//*/
+
+	Stack_LRk_MethodAlg alg4;
+	alg4.SetRulesOfAlg();
+	alg4.SetParsingStr(input_str);
+	alg4.DoParse();
 
 	system("pause");
 	return 0;
