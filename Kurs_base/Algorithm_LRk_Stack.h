@@ -26,6 +26,7 @@ private:
 	vector<vector<TypeOfRelation>> relation_table;
 	ItemString stack_str;
 	ItemString parsing_item;
+	RuleNum rulenum;
 	//RuleNum rulenum;
 	//ItemString trio;
 	unsigned point_of_entry;
@@ -43,7 +44,8 @@ private:
 
 //	void TransformAccordingRule(const RuleNum& rulenum);
 
-//	void WriteToLog(const RuleNum& cur_rule_num = { -1, 0 });
+	void WriteToLog(const RuleNum& rel_rule_num, const string& stack_s, const string& parse_s,
+		const string& trio_str = "", const RuleNum& res_rule_num = { -1, 0 });
 
 
 };

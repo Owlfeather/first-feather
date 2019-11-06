@@ -82,5 +82,7 @@ enum TypeOfRelation
 	CONV,		// свёртка
 	CONV_BR,	// свёртка скобок
 	ERROR,
+	ID_ERROR,
+	OP_ERROR,
 	EXIT
 };

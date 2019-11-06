@@ -13,7 +13,7 @@ int main() {
 	cout << "Запуск!" << endl;
 
 	//string input_str = "d+c*(a+b)";
-	string input_str = "()";
+	string input_str = "(Udh-(hdhdh*(((tuh)))))";
 	
 	/*
 	LtoR_MethodAlg alg1;

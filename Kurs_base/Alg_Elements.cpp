@@ -77,6 +77,14 @@ void ParseLog::PrintLogLLk()
 	}
 }
 
+void ParseLog::PrintLogLRk()
+{
+	cout << endl << endl << "Лог:" << endl;
+	for (int i = 0; i < records.size(); i++) {
+		dynamic_cast<LRk_Stack_Line*>(records[i])->PrintLine();
+	}
+}
+
 
 
 
@@ -207,4 +215,56 @@ void LLk_TtoD_Line::PrintLine()
 	}
 
 
+}
+
+//---------------------LRk_Stack_Line---------------------
+
+
+void LRk_Stack_Line::SetLine(const string& pars_str, const RuleNum rulenum, const string& st_str, const TypeOfRelation rel_str, const string& tr_str, const RuleNum res_str)
+{
+	cur_string = pars_str;
+	rule_num = rulenum;
+	stack_str = st_str;
+	relation_str = rel_str;
+	trio_str = tr_str;
+	result_str = res_str;
+}
+
+void LRk_Stack_Line::PrintLine()
+{
+	cout << "Стек: " << stack_str << " Рассматриваемый элемент: " << cur_string;
+	switch (relation_str)
+	{
+	case CARRY:
+		cout << " Отношение: < Операция: Перенос";
+		break;
+	case CONV:
+		cout << " Отношение: > Операция: Свёртка ";
+		cout << " Тройка: " << trio_str << " Результат: " ;
+		if (result_str.fir_num == 0) {
+			cout << "Выражение";
+		}
+		else if (result_str.fir_num == 1) {
+			cout << "Терм";
+		}
+		break;
+	case CONV_BR:
+		cout << " Отношение: = Операция: Свёртка ";
+		cout << " Тройка: " << trio_str << " Результат: Множ";
+		break;
+	case ERROR:
+		cout << " Отношение: ? Операция: Ошибка ";
+		break;
+	case ID_ERROR:
+		cout << " Отношение: ! Операция: Отсутствие идентификатора ";
+		break;
+	case OP_ERROR:
+		cout << " Отношение: ! Операция: Отсутствие оператора ";
+		break;
+	case EXIT:
+		cout << " Отношение: В Операция: Выход ";
+		break;
+	}
+	cout << endl;
+	
 }

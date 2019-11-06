@@ -64,7 +64,7 @@ void Stack_LRk_MethodAlg::SetRulesOfAlg()
 	}
 
 
-	relation_table.push_back({ CARRY, CARRY, CARRY, ERROR, EXIT });
+	relation_table.push_back({ CARRY, CARRY, CARRY, ERROR, EXIT, ID_ERROR, OP_ERROR });
 	relation_table.push_back({ CONV, CARRY, CARRY, CONV, CONV });
 	relation_table.push_back({ CONV, CONV, CARRY, CONV, CONV });
 	relation_table.push_back({ CARRY, CARRY, CARRY, CONV_BR, ERROR });
@@ -113,7 +113,7 @@ void Stack_LRk_MethodAlg::SetRulesOfAlg()
 bool Stack_LRk_MethodAlg::DoParse()
 {
 	bool okey = true;
-	RuleNum rulenum;
+	//RuleNum rulenum;
 	ItemSymb beg("beg");
 	ItemSymb end("end");
 	point_of_entry = 0;
@@ -131,8 +131,9 @@ bool Stack_LRk_MethodAlg::DoParse()
 			symb_found = SelectNextSymb();
 
 			if (!symb_found) {
-				cout << "\nОшибка, дальнейший разбор невозможен\n";
+				cout << "\nОшибка, дальнейший разбор невозможен0\n";
 				okey = false;
+				parsing_log.PrintLogLRk();
 				return true;
 			}
 		}
@@ -142,9 +143,13 @@ bool Stack_LRk_MethodAlg::DoParse()
 		
 		rulenum = { FindLeftNum(), FindRightNum() };
 
-		if (rulenum.sec_num == -1) {
+		///
+
+		if ((rulenum.fir_num == -1)||(rulenum.sec_num == -1)) {
 			cout << "\nОшибка, дальнейший разбор невозможен\n";
 			okey = false;
+			WriteToLog({ 0, 6 }, string(stack_str), string(parsing_item));
+			parsing_log.PrintLogLRk();
 			return true;
 		}
 		
@@ -161,7 +166,9 @@ bool Stack_LRk_MethodAlg::DoParse()
 			conv_done = DoConvolution(true);
 			conv_happened = true;
 			if (!conv_done) {
-				cout << "\n\nОшибка, дальнейший разбор невозможен";
+				//cout << "\n\nОшибка, дальнейший разбор невозможен1";
+				cout << "\nНет идентификатора для свертки тройки\n";
+				WriteToLog({ 0, 5 }, string(stack_str), string(parsing_item));
 				okey = false;
 			}
 			break;
@@ -169,15 +176,17 @@ bool Stack_LRk_MethodAlg::DoParse()
 			conv_done = DoConvolution(false);
 			conv_happened = true;
 			if (!conv_done) {
-				cout << "\n\nОшибка, дальнейший разбор невозможен";
+				cout << "\n\nОшибка, дальнейший разбор невозможен2";
 				okey = false;
 			}
 			break;
 		case ERROR:
-			cout << "\n\nОшибка, дальнейший разбор невозможен";
+			WriteToLog(rulenum, string(stack_str), string(parsing_item));
+			cout << "\n\nОшибка, дальнейший разбор невозможен3";
 			okey = false;
 			break;
 		case EXIT:
+			WriteToLog(rulenum, string(stack_str), string(parsing_item));
 			cout << "\n\nРазбор завершён успешно";
 			okey = false;
 			break;
@@ -191,7 +200,7 @@ bool Stack_LRk_MethodAlg::DoParse()
 
 	}
 
-
+	parsing_log.PrintLogLRk();
 	return true;
 }
 
@@ -200,6 +209,7 @@ void Stack_LRk_MethodAlg::SetParsingStr(ItemString inp_str)
 	unsigned inp_size = inp_str.Length();
 	int symb_code;
 	bool prev_is_letter = false;
+	unsigned num_of_id = 0;
 
 	for (unsigned i = 0; i < inp_size; i++) {
 
@@ -213,7 +223,8 @@ void Stack_LRk_MethodAlg::SetParsingStr(ItemString inp_str)
 			///это буква
 			if (!prev_is_letter) { // буква встретилась первой
 				prev_is_letter = true;
-				parsing_str.AddSymb(ItemSymb("<Ид>"));
+				num_of_id++;
+				parsing_str.AddSymb(ItemSymb("<Ид" + to_string(num_of_id) + ">"));
 			}
 			// иначе - просто следующая буква идентификатора	
 		}
@@ -256,9 +267,13 @@ bool Stack_LRk_MethodAlg::SelectNextSymb()
 		
 		cout << "\nРассматриваемая конструкция:\n";
 		parsing_item.PrintString();
-
-		if ((parsing_item.Length() == 1) && (parsing_item[0] != ItemSymb("("))) {
+		/////////////////////////////////////////
+		if ((parsing_item.Length() == 1) && ((parsing_item[0] == ItemSymb("+") )
+											|| (parsing_item[0] == ItemSymb("-"))
+											|| (parsing_item[0] == ItemSymb("*"))
+											|| (parsing_item[0] == ItemSymb("/") )) ) {
 			cout << "\nНет идентификатора для свертки тройки\n";
+			WriteToLog({ 0, 5 }, string(stack_str), string(parsing_item));
 			return false;
 		}
 
@@ -291,6 +306,7 @@ int Stack_LRk_MethodAlg::FindLeftNum()
 	else if (stack_s == ItemSymb(")")) {
 		result = 4;
 	}
+	else result = -1;
 
 	return result;
 }
@@ -326,6 +342,8 @@ int Stack_LRk_MethodAlg::FindRightNum()
 
 void Stack_LRk_MethodAlg::DoCarry()
 {
+	WriteToLog(rulenum, string(stack_str), string(parsing_item));
+
 	for (int i = 0; i < parsing_item.Length(); i++) {
 		stack_str.AddSymb(parsing_item[i]);
 	}
@@ -339,9 +357,14 @@ void Stack_LRk_MethodAlg::DoCarry()
 
 bool Stack_LRk_MethodAlg::DoConvolution(bool full)
 {
-	static int trio_num = 0;
+	static int trio_num = 1;
 	
 	int stack_len = stack_str.Length();
+	RuleNum cur_rule;
+	ItemString trio;
+
+	string stack_for_line = string(stack_str);
+	string parse_for_line = string(parsing_item);
 
 	cout << "\nДо свёртки скобок:\n Стек: ";
 	stack_str.PrintString();
@@ -356,9 +379,31 @@ bool Stack_LRk_MethodAlg::DoConvolution(bool full)
 	else {
 		if (full) {
 
-			ItemString trio({ ItemSymb("R" + to_string(trio_num)), ItemSymb("=") });
+			trio.AddSymb(ItemSymb("R" + to_string(trio_num)));
+			trio.AddSymb(ItemSymb("="));
+				
+			//	= { ItemSymb("R" + to_string(trio_num)), ItemSymb("=") };
 			trio.AddSymb(stack_str[stack_len - 2]);
 			trio.AddSymb(stack_str[stack_len - 1]);
+
+			ItemSymb oper = trio[trio.Length() - 1];
+			
+			if (oper == ItemSymb("+")) {
+				//0,1
+				cur_rule = { 0, 1 };
+			}
+			else if (oper == ItemSymb("-")) {
+				//0,2
+				cur_rule = { 0, 2 };
+			}
+			else if (oper == ItemSymb("*")) {
+				//1,1
+				cur_rule = { 1, 1 };
+			}
+			else if (oper == ItemSymb("/")) {
+				//1,2
+				cur_rule = { 1, 2 };
+			}
 
 			stack_str.DeleteSymb(stack_len - 2, 2);
 
@@ -372,13 +417,27 @@ bool Stack_LRk_MethodAlg::DoConvolution(bool full)
 			parsing_item.PrintString();
 			cout << "\n Тройка: ";
 			trio.PrintString();
+
+			cout << "\n Результат: ";
+			if (cur_rule.fir_num == 0) {
+				cout << "Выражение";
+			}
+			else if (cur_rule.fir_num == 1) {
+				cout << "Терм";
+			}
+
+
+
 		}
 		else {
 
 			if (stack_str[stack_len - 1] == ItemSymb("(")) {
 
 				trio_num--;
-				ItemString trio({ ItemSymb("R" + to_string(trio_num)), ItemSymb("=") });
+				//ItemString trio({ ItemSymb("R" + to_string(trio_num)), ItemSymb("=") });
+				trio.AddSymb(ItemSymb("R" + to_string(trio_num)));
+				trio.AddSymb(ItemSymb("="));
+
 				trio.AddSymb(stack_str[stack_len - 1]);
 				trio.AddSymb(parsing_item[0]);
 				trio.AddSymb(parsing_item[1]);
@@ -397,6 +456,8 @@ bool Stack_LRk_MethodAlg::DoConvolution(bool full)
 					parsing_item.PrintString();
 					cout << "\n Тройка: ";
 					trio.PrintString();
+					cout << "\n Результат: Множ";
+					//2,1
 				}
 			}
 			else {
@@ -405,6 +466,8 @@ bool Stack_LRk_MethodAlg::DoConvolution(bool full)
 		}
 		cout << "\n";
 
+		WriteToLog(rulenum, stack_for_line, parse_for_line, string(trio), cur_rule);
+
 		trio_num++;
 		return true;
 	}
@@ -412,4 +475,17 @@ bool Stack_LRk_MethodAlg::DoConvolution(bool full)
 	
 
 
+}
+
+void Stack_LRk_MethodAlg::WriteToLog(const RuleNum& rel_rule_num, const string& stack_s, 
+									 const string& parse_s, const string& trio_str,
+									 const RuleNum& res_rule_num)
+{
+	LRk_Stack_Line* buf_line;
+	cout << "Осуществляется запись в лог" << endl;
+	buf_line = new LRk_Stack_Line();
+
+
+	buf_line->SetLine(parse_s, rel_rule_num, stack_s, relation_table[rel_rule_num.fir_num][rel_rule_num.sec_num], trio_str, res_rule_num);
+	parsing_log.AddRecordLine(buf_line);
 }
